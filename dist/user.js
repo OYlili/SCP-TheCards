@@ -2,13 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Action = exports.User = exports.users = exports.Item = exports.Deck = void 0;
 const level_1 = require("level");
-const config_1 = require("./config");
+const library_1 = require("./library");
 class Deck {
     constructor(deck_action, player_id) {
         this.name = deck_action.name;
         this.main_faction = deck_action.main_faction;
         this.ally_faction = deck_action.ally_faction;
-        this.card_back = "cardback_starter_usa";
+        this.card_back = "cardback_starter_" + deck_action.main_faction.toLowerCase();
         this.deck_code = deck_action.deck_code;
         this.favorite = false;
         this.id = Math.floor(Math.random() * 900000) + 100000;
@@ -26,7 +26,7 @@ class Deck {
             is_gold: true,
             location: is_left ? "board_hqleft" : "board_hqright",
             location_number: 0,
-            name: config_1.deckCodeIDsTable[this.deck_code.split("|")[2].slice(0, 2)].card
+            name: library_1.deckCodeIDsTable[this.deck_code.split("|")[2].slice(0, 2)].card
         };
         for (const i of [0, 1, 2, 3]) {
             cards_code[i].match(/.{1,2}/g)?.forEach((code) => {
@@ -36,7 +36,7 @@ class Deck {
                         is_gold: true,
                         location: is_left ? "deck_left" : "deck_right",
                         location_number: 0,
-                        name: config_1.deckCodeIDsTable[code].card
+                        name: library_1.deckCodeIDsTable[code].card
                     });
                 }
             });
@@ -50,6 +50,22 @@ class Deck {
             cards,
             location
         };
+    }
+    isVaild() {
+        const cards_code = this.deck_code.replace(/~[^|]*/g, "").split("|")[1].split(";");
+        const cards = {};
+        let result = true;
+        for (const i of [0, 1, 2, 3]) {
+            cards_code[i].match(/.{1,2}/g)?.forEach((code) => {
+                if (!cards[code])
+                    cards[code] = i + 1;
+                else
+                    cards[code] += i + 1;
+                if (cards[code] > 4)
+                    result = false;
+            });
+        }
+        return result;
     }
     name;
     main_faction;
@@ -80,6 +96,8 @@ class User {
         this.locale = "zh-Hans";
         this.decks = {};
         this.equipped_item = [];
+        this.items = [];
+        this.banned = false;
     }
     async store() {
         await exports.users.put(this.user_name, JSON.stringify(this));
@@ -92,6 +110,8 @@ class User {
     tag;
     decks;
     equipped_item;
+    items;
+    banned;
 }
 exports.User = User;
 class Action {

@@ -12,12 +12,26 @@ const common_1 = require("@nestjs/common");
 const match_dto_1 = require("./match.dto");
 const user_1 = require("../user");
 const config_1 = require("../config");
+const main_1 = require("../main");
 let MatchService = class MatchService {
     static { MatchService_1 = this; }
-    static waitingPlayers = [];
+    static waitingPlayers1 = [];
+    static waitingPlayers2 = [];
     static battaleCodePlayers = {};
     static matchedPairs = {};
-    joinMatch(lobbyPlayer) {
+    async joinMatch(lobbyPlayer) {
+        const user = JSON.parse(await user_1.users.get("" + lobbyPlayer.player_id));
+        if (user.name == "<anon>") {
+            main_1.clients[user.id]?.client.send(JSON.stringify({
+                message: "请改名",
+                channel: "disconnect",
+                context: null,
+                timestamp: "",
+                sender: "Server",
+                receiver: null
+            }));
+            return;
+        }
         if (lobbyPlayer.extra_data.startsWith("battle_code:")) {
             if (!MatchService_1.battaleCodePlayers[lobbyPlayer.extra_data])
                 MatchService_1.battaleCodePlayers[lobbyPlayer.extra_data] = [];
@@ -28,14 +42,27 @@ let MatchService = class MatchService {
                 const match_info = new match_dto_1.MatchInfo(match_id, players.shift(), players.shift());
                 MatchService_1.matchedPairs[match_id] = match_info;
             }
-            return;
+            return true;
         }
-        MatchService_1.waitingPlayers.push(lobbyPlayer);
-        if (MatchService_1.waitingPlayers.length >= 2) {
-            const match_id = Math.floor(Math.random() * 900000) + 100000;
-            const match_info = new match_dto_1.MatchInfo(match_id, MatchService_1.waitingPlayers.shift(), MatchService_1.waitingPlayers.shift());
-            MatchService_1.matchedPairs[match_id] = match_info;
+        if (!user_1.Deck.prototype.isVaild.call(user.decks[lobbyPlayer.deck_id]))
+            return false;
+        if (lobbyPlayer.extra_data == "") {
+            MatchService_1.waitingPlayers1.push(lobbyPlayer);
+            if (MatchService_1.waitingPlayers1.length >= 2) {
+                const match_id = Math.floor(Math.random() * 900000) + 100000;
+                const match_info = new match_dto_1.MatchInfo(match_id, MatchService_1.waitingPlayers1.shift(), MatchService_1.waitingPlayers1.shift());
+                MatchService_1.matchedPairs[match_id] = match_info;
+            }
         }
+        else {
+            MatchService_1.waitingPlayers2.push(lobbyPlayer);
+            if (MatchService_1.waitingPlayers2.length >= 2) {
+                const match_id = Math.floor(Math.random() * 900000) + 100000;
+                const match_info = new match_dto_1.MatchInfo(match_id, MatchService_1.waitingPlayers2.shift(), MatchService_1.waitingPlayers2.shift());
+                MatchService_1.matchedPairs[match_id] = match_info;
+            }
+        }
+        return true;
     }
     async checkMatch(player_id) {
         let match = null;
@@ -126,24 +153,45 @@ let MatchService = class MatchService {
         return match.matchStartingInfo;
     }
     processMatch(match_id, action, player) {
+        const match = MatchService_1.matchedPairs[match_id];
+        if (config_1.ban_cheat && action.action_type == "XActionCheat") {
+            main_1.clients[player.id].client.send(JSON.stringify({
+                message: "该账户已被封禁",
+                channel: "disconnect",
+                context: null,
+                timestamp: "",
+                sender: "Server",
+                receiver: null
+            }));
+            player.banned = true;
+            user_1.User.prototype.store.call(player);
+            match.winner_side = player.id == match.left.player_id ? "right" : "left";
+            return;
+        }
         if (action.action == "lvl-loaded")
             return { "otherPlayerReady": 1 };
+        if (action.action == "end-match" && !match.winner_side) {
+            match.winner_side = action.value.winner_side;
+        }
         if (action.action_type || action.action) {
-            const match = MatchService_1.matchedPairs[match_id];
+            if (action.action_id) {
+                if (player.id == match.left.player_id && action.action_id >= match.left_minactionid)
+                    match.left_minactionid = action.action_id;
+                else if (action.action_id >= match.right_minactionid)
+                    match.right_minactionid = action.action_id;
+            }
             if (match.left.player_id == player.id)
                 match.right_actions.push(action);
             else
                 match.left_actions.push(action);
-            if (action.action == "end-match") {
-                match.winner_side = action.value.winner_side;
-            }
         }
         return "OK";
     }
-    actions(match_id, player) {
+    actions(match_id, player, body) {
         const match = MatchService_1.matchedPairs[match_id];
         const result = {};
-        if (match.getActionsById(player.id).length != 0)
+        const actions = match.getActionsById(player.id);
+        if (actions.length != 0 && actions.findIndex((a) => a.action_id == body.min_action_id || a.action) != -1 && actions.sort((a, b) => a.action_id - b.action_id).every((a, i) => a.action || i == 0 || a.action_id - 1 == actions[i - 1].action_id))
             result.actions = match.getActionsById(player.id).splice(0);
         result.match = {
             player_status_left: match.player_status_left,
@@ -151,8 +199,33 @@ let MatchService = class MatchService {
             status: "running"
         };
         result.opponent_polling = true;
-        if (match.winner_side)
+        if (match.winner_side) {
             result.match.status = "finished";
+            result.actions = [{
+                    "action_type": "XActionCheat",
+                    "player_id": match.left.player_id == player.id ? match.right.player_id : match.left.player_id,
+                    "action_data": {
+                        "0": "DamageCard",
+                        "1": match.winner_side == "left" ? "41" : "1",
+                        "2": "99",
+                        "playerID": match.left.player_id == player.id ? match.right.player_id : match.left.player_id
+                    },
+                    "action_id": match.left.player_id == player.id ? match.right_minactionid + 1 : match.left_minactionid + 1,
+                    "local_subactions": 1
+                }].concat(result.actions);
+            result.match = {
+                player_status_left: "mulligan_done",
+                player_status_right: "mulligan_done",
+                status: "finished"
+            };
+            if (match.left.player_id == player.id) {
+                match.right_minactionid = result.actions[0].action_id;
+            }
+            else {
+                match.left_minactionid = result.actions[0].action_id;
+            }
+        }
+        ;
         return result;
     }
     mulligan(match_id, mulliganCards, player) {
@@ -211,9 +284,12 @@ let MatchService = class MatchService {
         }
     }
     quit(player) {
-        let i = MatchService_1.waitingPlayers.findIndex((p) => p.player_id == player.player_id);
+        let i = MatchService_1.waitingPlayers1.findIndex((p) => p.player_id == player.player_id);
         if (i != -1)
-            MatchService_1.waitingPlayers.splice(i, 1);
+            MatchService_1.waitingPlayers1.splice(i, 1);
+        i = MatchService_1.waitingPlayers2.findIndex((p) => p.player_id == player.player_id);
+        if (i != -1)
+            MatchService_1.waitingPlayers2.splice(i, 1);
         for (const code in MatchService_1.battaleCodePlayers) {
             i = MatchService_1.battaleCodePlayers[code].findIndex((p) => p.player_id == player.player_id);
             if (i != -1)

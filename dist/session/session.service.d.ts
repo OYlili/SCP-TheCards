@@ -1,6 +1,6 @@
 import { Session } from "./session.dto";
 export declare class SessionService {
-    getSession(session: Session): Promise<{
+    getSession(session: Session): Promise<"banned" | {
         achievements_url: string;
         all_knockout_tourneys: never[];
         britain_level: number;

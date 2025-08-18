@@ -5,3 +5,8 @@ export declare class CreateDeck {
     readonly ally_faction: ally_faction;
     readonly deck_code: string;
 }
+export declare class ChangeDeck {
+    readonly id: number;
+    readonly name: string;
+    readonly action: string;
+}

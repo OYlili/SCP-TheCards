@@ -17,6 +17,7 @@ export declare class Deck {
             name: any;
         };
     };
+    isVaild(): boolean;
     name: string;
     main_faction: main_faction;
     ally_faction: ally_faction;
@@ -47,6 +48,8 @@ export declare class User {
         [key: number]: Deck;
     };
     equipped_item: Item[];
+    items: any;
+    banned: boolean;
 }
 export declare class Action {
     action: string;

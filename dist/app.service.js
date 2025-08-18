@@ -10,6 +10,7 @@ exports.AppService = void 0;
 const common_1 = require("@nestjs/common");
 const config_1 = require("./config");
 const user_1 = require("./user");
+const library_1 = require("./library");
 let AppService = class AppService {
     async getConfig(auth) {
         const config = {
@@ -59,12 +60,20 @@ let AppService = class AppService {
         return config;
     }
     getItems(player) {
-        return { equipped_items: player.equipped_item, items: config_1.items };
+        if (!player.items)
+            player.items = [];
+        user_1.User.prototype.store.call(player);
+        return { equipped_items: player.equipped_item, items: library_1.items.concat(player.items) };
     }
     equipItem(player, item) {
-        if (item.slot != "avatar")
-            return;
-        player.equipped_item = [item];
+        if (!player.equipped_item)
+            player.equipped_item = [];
+        let i = -1;
+        while ((i = player.equipped_item.findIndex((i) => i.slot == item.slot)) != -1) {
+            player.equipped_item.splice(i, 1);
+        }
+        ;
+        player.equipped_item.push(item);
         user_1.User.prototype.store.call(player);
     }
 };

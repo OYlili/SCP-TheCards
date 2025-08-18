@@ -32,6 +32,9 @@ let PlayersController = class PlayersController {
     decksAction(deck_action, player_id, deck_id) {
         return this.playersService.decksAction(deck_action, player_id, deck_id);
     }
+    changeDeck(deck_action, player_id) {
+        return this.playersService.changeDeck(deck_action, player_id);
+    }
     async deleteDeck(player_id, deck_id) {
         const user = JSON.parse(await user_1.users.get(player_id + ""));
         delete user.decks[deck_id];
@@ -65,6 +68,14 @@ __decorate([
     __metadata("design:paramtypes", [user_1.Action, String, Number]),
     __metadata("design:returntype", void 0)
 ], PlayersController.prototype, "decksAction", null);
+__decorate([
+    (0, common_1.Put)(":player_id/decks/"),
+    __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Param)("player_id")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [create_deck_dto_1.ChangeDeck, String]),
+    __metadata("design:returntype", void 0)
+], PlayersController.prototype, "changeDeck", null);
 __decorate([
     (0, common_1.Delete)(":player_id/decks/:deck_id"),
     __param(0, (0, common_1.Param)("player_id")),

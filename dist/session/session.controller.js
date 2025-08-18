@@ -21,18 +21,30 @@ let SessionController = class SessionController {
     constructor(sessionService) {
         this.sessionService = sessionService;
     }
-    getSession(session) {
-        return this.sessionService.getSession(session);
+    async getSession(session, res) {
+        const result = await this.sessionService.getSession(session);
+        switch (result) {
+            case "banned": return res.status(403).json({
+                "error": {
+                    "code": "user_error",
+                    "description": "banned"
+                },
+                "message": "Forbidden",
+                "status_code": 403
+            });
+            default:
+                return res.status(200).json(result);
+        }
     }
 };
 exports.SessionController = SessionController;
 __decorate([
     (0, common_1.Post)(),
-    (0, common_1.HttpCode)(200),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Res)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [session_dto_1.Session]),
-    __metadata("design:returntype", Object)
+    __metadata("design:paramtypes", [session_dto_1.Session, Object]),
+    __metadata("design:returntype", Promise)
 ], SessionController.prototype, "getSession", null);
 exports.SessionController = SessionController = __decorate([
     (0, common_1.Controller)('session'),

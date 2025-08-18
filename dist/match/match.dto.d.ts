@@ -7,6 +7,7 @@ export declare class LobbyPlayer {
 export declare class MatchAction {
     action: string;
     action_type: string;
+    action_id: number;
 }
 export declare class MulliganCards {
     discarded_card_ids: number[];
@@ -43,5 +44,7 @@ export declare class MatchInfo {
     right_deck: MatchCard[];
     left_hand: MatchCard[];
     right_hand: MatchCard[];
+    left_minactionid: number;
+    right_minactionid: number;
     winner_side: string;
 }

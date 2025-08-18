@@ -1,5 +1,5 @@
 import { PlayersService } from './players.service';
-import { CreateDeck } from './create_deck.dto';
+import { ChangeDeck, CreateDeck } from './create_deck.dto';
 import { Action } from 'src/user';
 export declare class PlayersController {
     private readonly playersService;
@@ -16,6 +16,7 @@ export declare class PlayersController {
     };
     createDeck(create_deck: CreateDeck, player_id: string): Promise<import("src/user").Deck>;
     decksAction(deck_action: Action, player_id: string, deck_id: number): Promise<void>;
+    changeDeck(deck_action: ChangeDeck, player_id: string): Promise<void>;
     deleteDeck(player_id: string, deck_id: number): Promise<void>;
     heartbeat(): {};
 }

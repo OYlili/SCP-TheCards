@@ -1,6 +1,6 @@
 import { Level } from "level";
 import { CreateDeck } from "./players/create_deck.dto";
-import { deckCodeIDsTable } from "./config";
+import { deckCodeIDsTable } from "./library";
 import { MatchCard } from "./match/match.dto";
 
 export type main_faction = "Germany" | "Britain" | "Soviet" | "USA" | "Japan";

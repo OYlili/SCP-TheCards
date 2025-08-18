@@ -29,6 +29,18 @@ let PlayersService = class PlayersService {
         }
         user_1.User.prototype.store.call(user);
     }
+    async changeDeck(action, player_id) {
+        const user = JSON.parse(await user_1.users.get(player_id));
+        switch (action.action) {
+            case "rename":
+                user.decks[action.id].name = action.name;
+                break;
+            case "change_card_back":
+                user.decks[action.id].card_back = action.name;
+                break;
+        }
+        user_1.User.prototype.store.call(user);
+    }
 };
 exports.PlayersService = PlayersService;
 exports.PlayersService = PlayersService = __decorate([

@@ -10,6 +10,7 @@ exports.LobbyPlayer = LobbyPlayer;
 class MatchAction {
     action;
     action_type;
+    action_id;
 }
 exports.MatchAction = MatchAction;
 class MulliganCards {
@@ -33,6 +34,8 @@ class MatchInfo {
         this.right_actions = [];
         this.player_status_left = "not_done";
         this.player_status_right = "not_done";
+        this.left_minactionid = 0;
+        this.right_minactionid = 0;
     }
     hasPlayer(player_id) {
         return this.left.player_id == player_id || this.right.player_id == player_id;
@@ -57,6 +60,8 @@ class MatchInfo {
     right_deck;
     left_hand;
     right_hand;
+    left_minactionid;
+    right_minactionid;
     winner_side;
 }
 exports.MatchInfo = MatchInfo;

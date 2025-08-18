@@ -7,15 +7,16 @@ const platform_express_1 = require("@nestjs/platform-express");
 const express = require("express");
 const ws_1 = require("ws");
 const user_1 = require("./user");
+const config_1 = require("./config");
 async function bootstrap() {
     const server = express();
     server.disable("etag");
     server.disable("x-powered-by");
     const app = await core_1.NestFactory.create(app_module_1.AppModule, new platform_express_1.ExpressAdapter(server));
-    await app.listen(5231);
+    await app.listen(config_1.port);
 }
 bootstrap();
-const wss = new ws_1.WebSocket.Server({ port: 5232 });
+const wss = new ws_1.WebSocket.Server({ port: config_1.ws_port });
 exports.clients = {};
 wss.on("connection", async (ws, req) => {
     const user = JSON.parse(await user_1.users.get(req.headers["authorization"].slice(4)));
@@ -34,7 +35,7 @@ wss.on("connection", async (ws, req) => {
                 }));
                 break;
             case "touchcard":
-                exports.clients[msg.receiver].client.send(JSON.stringify({
+                exports.clients[msg.receiver]?.client.send(JSON.stringify({
                     message: msg.message,
                     channel: "touchcard",
                     context: msg.context,
@@ -43,9 +44,19 @@ wss.on("connection", async (ws, req) => {
                     receiver: msg.receiver
                 }));
                 break;
+            case "emoji":
+                exports.clients[msg.receiver]?.client.send(JSON.stringify({
+                    message: msg.message,
+                    channel: "emoji",
+                    context: msg.context,
+                    timestamp: new Date(),
+                    sender: user.id,
+                    receiver: msg.receiver
+                }));
+                break;
             case "notification":
                 if (msg.message == "websocketcheck") {
-                    exports.clients[msg.receiver].client.send(JSON.stringify({
+                    exports.clients[msg.receiver]?.client.send(JSON.stringify({
                         message: "websocketcheck",
                         channel: "notification",
                         context: msg.context,
@@ -55,7 +66,7 @@ wss.on("connection", async (ws, req) => {
                     }));
                 }
                 else if (msg.message == "matchaction") {
-                    exports.clients[msg.receiver].client.send(JSON.stringify({
+                    exports.clients[msg.receiver]?.client.send(JSON.stringify({
                         message: "matchaction",
                         channel: "notification",
                         context: msg.context,
@@ -65,7 +76,7 @@ wss.on("connection", async (ws, req) => {
                     }));
                 }
                 else if (msg.message == "im_here") {
-                    exports.clients[msg.receiver].client.send(JSON.stringify({
+                    exports.clients[msg.receiver]?.client.send(JSON.stringify({
                         message: "im_here",
                         channel: "notification",
                         context: "",
@@ -78,6 +89,7 @@ wss.on("connection", async (ws, req) => {
         }
     });
     ws.on("close", () => {
+        delete exports.clients[user.id];
     });
 });
 //# sourceMappingURL=main.js.map

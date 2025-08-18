@@ -17,14 +17,14 @@ const common_1 = require("@nestjs/common");
 const match_service_1 = require("./match.service");
 const match_dto_1 = require("./match.dto");
 const user_1 = require("../user");
-const main_1 = require("../main");
 let MatchController = class MatchController {
     matchService;
     constructor(matchService) {
         this.matchService = matchService;
     }
-    joinMatch(lobbyPlayer) {
-        this.matchService.joinMatch(lobbyPlayer);
+    async joinMatch(lobbyPlayer, req) {
+        if (!await this.matchService.joinMatch(lobbyPlayer))
+            req.socket.destroy();
         return "OK";
     }
     quitMatch(lobbyPlayer) {
@@ -41,8 +41,8 @@ let MatchController = class MatchController {
     async processMatch(auth, id, matchAction) {
         return this.matchService.processMatch(id, matchAction, JSON.parse(await user_1.users.get(auth.slice(8))));
     }
-    async actions(auth, id) {
-        return this.matchService.actions(id, JSON.parse(await user_1.users.get(auth.slice(8))));
+    async actions(auth, id, body) {
+        return this.matchService.actions(id, JSON.parse(await user_1.users.get(auth.slice(8))), body);
     }
     async sendAction(auth, id, matchAction) {
         return this.matchService.processMatch(id, matchAction, JSON.parse(await user_1.users.get(auth.slice(8))));
@@ -56,24 +56,15 @@ let MatchController = class MatchController {
     async post(auth, id) {
         return this.matchService.post(id, JSON.parse(await user_1.users.get(auth.slice(8))));
     }
-    kickall() {
-        Object.values(main_1.clients).forEach((c) => c.client.send(JSON.stringify({
-            message: "谁让你玩了?",
-            channel: "disconnect",
-            context: null,
-            timestamp: "",
-            sender: "Server",
-            receiver: null
-        })));
-    }
 };
 exports.MatchController = MatchController;
 __decorate([
     (0, common_1.Post)("lobbyplayers"),
     __param(0, (0, common_1.Body)()),
+    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [match_dto_1.LobbyPlayer]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:paramtypes", [match_dto_1.LobbyPlayer, Object]),
+    __metadata("design:returntype", Promise)
 ], MatchController.prototype, "joinMatch", null);
 __decorate([
     (0, common_1.Delete)("lobbyplayers"),
@@ -110,8 +101,9 @@ __decorate([
     (0, common_1.Put)("matches/v2/:id/actions"),
     __param(0, (0, common_1.Headers)("Authorization")),
     __param(1, (0, common_1.Param)("id")),
+    __param(2, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, Number]),
+    __metadata("design:paramtypes", [String, Number, Object]),
     __metadata("design:returntype", Promise)
 ], MatchController.prototype, "actions", null);
 __decorate([
@@ -148,12 +140,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Number]),
     __metadata("design:returntype", Promise)
 ], MatchController.prototype, "post", null);
-__decorate([
-    (0, common_1.Get)("kickall"),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], MatchController.prototype, "kickall", null);
 exports.MatchController = MatchController = __decorate([
     (0, common_1.Controller)(),
     __metadata("design:paramtypes", [match_service_1.MatchService])

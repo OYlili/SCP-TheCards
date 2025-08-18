@@ -1,4 +1,5 @@
 import { AppService } from './app.service';
+import { User } from './user';
 export declare class AppController {
     private readonly appService;
     constructor(appService: AppService);
@@ -12,4 +13,6 @@ export declare class AppController {
         }[];
     }>;
     equipItem(auth: string, body: any): Promise<any>;
+    setName(body: any, auth: string): Promise<string>;
+    getOnline(): User[];
 }
