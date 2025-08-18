@@ -1,9 +1,6 @@
-# 学习指南
+# 游戏频道
 
-- 安装NODE.JS后启动bat即可
-- 你需要更改的ts文件有 
-- src/config.ts
-- https://discord.gg/p2RjNjuV 
+- TG待补
 # 免责声明 / Disclaimer
 
 ## 中文版
