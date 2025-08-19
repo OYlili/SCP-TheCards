@@ -1,0 +1,25 @@
+2025-08-19 10:20:53 [info] HTTP 服务启动成功 | 端口: 5231
+2025-08-19 10:20:53 [info] 服务配置: HTTP=5231, WS=5232, Node=v24.6.0, PID=8488
+2025-08-19 10:21:03 [info] 在线人数: 0 | 用户ID:
+::ffff:127.0.0.1 - - [19/Aug/2025:02:21:13 +0000] "GET / HTTP/1.1" 200 641 "-" "kards/++UE5+Release-5.5-Fork-CL-0 (http-eventloop) Android/11"
+2025-08-19 10:21:13 [info] 在线人数: 0 | 用户ID:
+::ffff:127.0.0.1 - - [19/Aug/2025:02:21:13 +0000] "GET / HTTP/1.1" 200 641 "-" "kards/++UE5+Release-5.5-Fork-CL-0 (http-eventloop) Android/11"
+::ffff:127.0.0.1 - - [19/Aug/2025:02:21:13 +0000] "POST /session HTTP/1.1" 200 3017 "-" "kards/++UE5+Release-5.5-Fork-CL-0 (http-eventloop) Android/11"
+::ffff:127.0.0.1 - - [19/Aug/2025:02:21:13 +0000] "GET / HTTP/1.1" 200 1085 "-" "kards/++UE5+Release-5.5-Fork-CL-0 (http-eventloop) Android/11"
+::ffff:127.0.0.1 - - [19/Aug/2025:02:21:13 +0000] "GET /entitlements/473456 HTTP/1.1" 404 82 "-" "kards/++UE5+Release-5.5-Fork-CL-0 (http-eventloop) Android/11"
+::ffff:127.0.0.1 - - [19/Aug/2025:02:21:13 +0000] "GET /store/v2/?provider=xsolla HTTP/1.1" 404 88 "-" "kards/++UE5+Release-5.5-Fork-CL-0 (http-eventloop) Android/11"
+::ffff:127.0.0.1 - - [19/Aug/2025:02:21:13 +0000] "GET /players/473456/friends?action=player-friends HTTP/1.1" 404 107 "-" "kards/++UE5+Release-5.5-Fork-CL-0 (http-eventloop) Android/11"
+2025-08-19 10:21:15 [info] 新连接请求 | IP: ::ffff:127.0.0.1
+2025-08-19 10:21:15 [info] 用户 473456 已连接 | 当前在线人数: 1
+::ffff:127.0.0.1 - - [19/Aug/2025:02:21:18 +0000] "PUT /players/473456/heartbeat HTTP/1.1" 200 2 "-" "kards/++UE5+Release-5.5-Fork-CL-0 (http-eventloop) Android/11"
+2025-08-19 10:21:23 [info] 在线人数: 1 | 用户ID: 473456
+2025-08-19 10:21:33 [info] 在线人数: 1 | 用户ID: 473456
+2025-08-19 10:21:43 [info] 在线人数: 1 | 用户ID: 473456
+2025-08-19 10:21:53 [info] 在线人数: 1 | 用户ID: 473456
+2025-08-19 10:22:03 [info] 在线人数: 1 | 用户ID: 473456
+::ffff:127.0.0.1 - - [19/Aug/2025:02:22:06 +0000] "GET /store/v2/txn HTTP/1.1" 404 75 "-" "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36"
+::ffff:127.0.0.1 - - [19/Aug/2025:02:22:06 +0000] "GET /favicon.ico HTTP/1.1" 404 74 "http://127.0.0.1:5231/store/v2/txn" "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36"
+2025-08-19 10:22:13 [info] 在线人数: 1 | 用户ID: 473456
+::ffff:127.0.0.1 - - [19/Aug/2025:02:22:20 +0000] "GET /players HTTP/1.1" 404 70 "-" "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36"
+::ffff:127.0.0.1 - - [19/Aug/2025:02:22:20 +0000] "GET /favicon.ico HTTP/1.1" 404 74 "http://127.0.0.1:5231/players" "Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Mobile Safari/537.36"
+2025-08-19 10:22:23 [info] 在线人数: 1 | 用户ID: 473456
